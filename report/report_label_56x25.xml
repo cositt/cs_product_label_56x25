@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Same trick as Odoo's Dymo format: height/width swapped + Landscape. -->
+    <record id="paperformat_label_56x25" model="report.paperformat">
+        <field name="name">Etiqueta 56 x 25 mm</field>
+        <field name="default" eval="False"/>
+        <field name="format">custom</field>
+        <field name="page_height">56</field>
+        <field name="page_width">25</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">0</field>
+        <field name="margin_bottom">0</field>
+        <field name="margin_left">0</field>
+        <field name="margin_right">0</field>
+        <field name="header_spacing">0</field>
+        <field name="disable_shrinking" eval="True"/>
+        <field name="dpi">96</field>
+    </record>
+
+    <!-- No binding: only reachable through the label wizard. -->
+    <record id="report_product_label_56x25" model="ir.actions.report">
+        <field name="name">Etiqueta de producto 56 x 25 mm (PDF)</field>
+        <field name="model">product.product</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">cs_product_label_56x25.report_label_56x25</field>
+        <field name="report_file">cs_product_label_56x25.report_label_56x25</field>
+        <field name="paperformat_id" ref="paperformat_label_56x25"/>
+        <field name="print_report_name">'Etiquetas 56x25'</field>
+    </record>
+</odoo>

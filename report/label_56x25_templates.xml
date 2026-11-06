@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--
+        56 x 25 mm, one label per page.
+        Barcode: 47.5 mm = 380 dots at 203 dpi = 4 dots per EAN-13 module,
+        so the printer driver does not have to resample the bars.
+    -->
+    <template id="report_label_56x25">
+        <t t-call="web.basic_layout">
+            <style>
+                .cs_label_page { margin: 0; padding: 0; }
+                .cs_label {
+                    width: 56mm; height: 24.6mm; overflow: hidden;
+                    padding: 1.2mm 2mm 0 2mm; box-sizing: border-box;
+                    font-family: Arial, Helvetica, sans-serif; color: #000;
+                    page-break-after: always; page-break-inside: avoid;
+                }
+                .cs_label:last-child { page-break-after: auto; }
+                .cs_label_name {
+                    font-size: 7.5pt; font-weight: bold; line-height: 1.1;
+                    height: 5.8mm; overflow: hidden; word-wrap: break-word;
+                }
+                .cs_label_row { height: 6mm; white-space: nowrap; }
+                .cs_label_left { float: left; width: 25mm; overflow: hidden; line-height: 1.15; padding-top: 0.3mm; }
+                .cs_label_variant { font-size: 6.5pt; font-weight: bold; overflow: hidden; }
+                .cs_label_ref { font-size: 6pt; overflow: hidden; }
+                .cs_label_price { font-size: 12pt; font-weight: bold; float: right; line-height: 6mm; }
+                .cs_label_barcode { text-align: center; clear: both; }
+                .cs_label_barcode img { display: block; margin: 0 auto; }
+                .cs_label_digits { font-size: 6pt; line-height: 1.1; letter-spacing: 0.3mm; }
+            </style>
+            <div class="page cs_label_page">
+                <t t-if="quantity">
+                    <t t-foreach="quantity.items()" t-as="barcode_and_qty_by_product">
+                        <t t-set="product" t-value="barcode_and_qty_by_product[0]"/>
+                        <t t-set="currency" t-value="pricelist.currency_id or product.currency_id"/>
+                        <t t-foreach="barcode_and_qty_by_product[1]" t-as="barcode_and_qty">
+                            <t t-set="barcode" t-value="barcode_and_qty[0]"/>
+                            <t t-foreach="range(barcode_and_qty[1])" t-as="qty">
+                                <t t-call="cs_product_label_56x25.label_56x25_single"/>
+                            </t>
+                        </t>
+                    </t>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <template id="label_56x25_single">
+        <div class="cs_label">
+            <div class="cs_label_name" t-out="label_name(product)"/>
+            <div class="cs_label_row">
+                <div class="cs_label_left">
+                    <t t-set="variant" t-value="label_variant(product)"/>
+                    <div class="cs_label_variant" t-if="variant" t-out="variant"/>
+                    <div class="cs_label_ref" t-if="product.default_code" t-out="product.default_code"/>
+                </div>
+                <strong class="cs_label_price" t-if="price_included"
+                        t-out="pricelist._get_product_price(product, 1, currency=currency)"
+                        t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+            </div>
+            <div class="cs_label_barcode" t-if="barcode">
+                <!-- symbology auto: EAN-13/EAN-8 when valid, Code128 otherwise -->
+                <div t-out="barcode" t-options="{'widget': 'barcode', 'symbology': 'auto', 'quiet': 0,
+                    'width': 380, 'height': 64, 'img_style': 'width:47.5mm;height:8mm'}"/>
+                <div class="cs_label_digits" t-out="barcode"/>
+            </div>
+        </div>
+    </template>
+</odoo>
