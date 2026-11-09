@@ -7,12 +7,14 @@ de Pequeño Planeta (USB, sin IoT, driver Windows «ZDesigner ZD220-203dpi ZPL»
 
 - Añade el formato **«Tienda 56 x 25 mm»** al asistente *Imprimir etiquetas*
   (Productos, variantes y recepciones). Es el formato por defecto; los demás siguen igual.
-- Una etiqueta por página de 56 x 25 mm: nombre (2 líneas), variante (talla/color),
+- Una etiqueta por página de 56 x 25 mm: nombre de la tienda, nombre (2 líneas), variante (talla/color),
   referencia, precio y código de barras (EAN-13 si es válido, si no Code128;
   sin código de barras → etiqueta sin barras).
 - **Precio**: de la tarifa del asistente. Por defecto, la del parámetro de sistema
   `cs_product_label_56x25.pricelist_id` y, si no existe, la que Odoo aplica al usuario
   (en Pequeño Planeta = tarifa 2 «Woo bebemalaga Pricelist»). Igual que Odoo, no añade impuestos.
+- **Nombre de la tienda**: línea superior con «Bebemálaga». Se cambia con el parámetro de sistema
+  `cs_product_label_56x25.shop_name`; en blanco, la línea no sale.
 - **Impresión directa**: en vez de descargar el PDF, abre el diálogo de impresión del
   navegador. Si algo falla, vuelve al comportamiento normal (descarga).
 - Añade el formato a *Tipo de operación → Imprimir etiquetas automáticamente* (recepciones).
@@ -42,5 +44,5 @@ de Pequeño Planeta (USB, sin IoT, driver Windows «ZDesigner ZD220-203dpi ZPL»
 ## Tests
 
 `odoo -d <db> -i cs_product_label_56x25 --test-enable --test-tags=/cs_product_label_56x25`
-(10 tests: formato, papel, otros formatos intactos, tarifa por defecto, variantes/precio/
-barcode, cantidades de recepción). El JS no tiene test automático.
+(15 tests: formato, papel, otros formatos intactos, tarifa por defecto, variantes/precio/
+barcode, cantidades de recepción, nombre de tienda, márgenes del PDF). El JS no tiene test automático.

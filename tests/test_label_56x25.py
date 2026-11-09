@@ -3,6 +3,7 @@ from odoo.tests import TransactionCase, tagged
 LABEL_FORMAT = 'cs_56_25'
 REPORT_XMLID = 'cs_product_label_56x25.report_product_label_56x25'
 PRICELIST_PARAM = 'cs_product_label_56x25.pricelist_id'
+SHOP_NAME_PARAM = 'cs_product_label_56x25.shop_name'
 
 
 @tagged('post_install', '-at_install')
@@ -146,3 +147,31 @@ class TestLabel56x25(TransactionCase):
         html, _ = report._render_qweb_html(REPORT_XMLID, docids=None, data={
             'active_model': 'product.product', 'quantity_by_product': {}, 'layout_wizard': 0})
         self.assertNotIn('class="cs_label"', html.decode())
+
+    # --- shop name header (INC-002) ----------------------------------------
+    def test_render_shop_name_default(self):
+        html = self._render(self._wizard(pricelist_id=self.pricelist.id))
+        self.assertEqual(html.count('class="cs_label_shop"'), 2)
+        self.assertIn('<div class="cs_label_shop">Bebemálaga</div>', html)
+
+    def test_render_shop_name_from_param(self):
+        self.env['ir.config_parameter'].sudo().set_param(SHOP_NAME_PARAM, 'Tienda Test')
+        html = self._render(self._wizard(pricelist_id=self.pricelist.id))
+        self.assertIn('<div class="cs_label_shop">Tienda Test</div>', html)
+        self.assertNotIn('Bebemálaga', html)
+
+    def test_render_shop_name_param_blank_hides_header(self):
+        self.env['ir.config_parameter'].sudo().set_param(SHOP_NAME_PARAM, ' ')
+        html = self._render(self._wizard(pricelist_id=self.pricelist.id))
+        self.assertNotIn('class="cs_label_shop"', html)
+
+    def test_label_box_sizing_for_wkhtmltopdf(self):
+        """wkhtmltopdf (old WebKit) only honours the prefixed property; without it the
+        2 mm side padding is added to the 56 mm width and the price overflows the edge."""
+        html = self._render(self._wizard(pricelist_id=self.pricelist.id))
+        self.assertIn('-webkit-box-sizing: border-box', html)
+
+    def test_report_body_margins_are_reset(self):
+        """Body and Bootstrap container margins would push the label off the 56 mm page."""
+        html = self._render(self._wizard(pricelist_id=self.pricelist.id))
+        self.assertIn('html, body, .container, .article, .cs_label_page {', html)
