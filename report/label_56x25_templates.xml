@@ -4,18 +4,31 @@
         56 x 25 mm, one label per page.
         Barcode: 47.5 mm = 380 dots at 203 dpi = 4 dots per EAN-13 module,
         so the printer driver does not have to resample the bars.
+        Height budget (24.6 mm): padding 0.8 + shop 2.8 + name 5.8 + row 6
+        + barcode 6.5 + digits 2.3 = 24.2 mm.
     -->
     <template id="report_label_56x25">
         <t t-call="web.basic_layout">
             <style>
-                .cs_label_page { margin: 0; padding: 0; }
+                /* The report body (and Bootstrap's .container) add their own side
+                   margins/padding; on a 56 mm page that pushes the label off the edge. */
+                html, body, .container, .article, .cs_label_page {
+                    margin: 0 !important; padding: 0 !important;
+                    width: auto !important; max-width: none !important;
+                }
                 .cs_label {
                     width: 56mm; height: 24.6mm; overflow: hidden;
-                    padding: 1.2mm 2mm 0 2mm; box-sizing: border-box;
+                    padding: 0.8mm 2mm 0 2mm;
+                    -webkit-box-sizing: border-box; box-sizing: border-box;
                     font-family: Arial, Helvetica, sans-serif; color: #000;
                     page-break-after: always; page-break-inside: avoid;
                 }
                 .cs_label:last-child { page-break-after: auto; }
+                .cs_label_shop {
+                    font-size: 6pt; font-weight: bold; line-height: 1.45;
+                    letter-spacing: 0.2mm;
+                    height: 2.8mm; overflow: hidden; white-space: nowrap;
+                }
                 .cs_label_name {
                     font-size: 7.5pt; font-weight: bold; line-height: 1.1;
                     height: 5.8mm; overflow: hidden; word-wrap: break-word;
@@ -48,6 +61,7 @@
 
     <template id="label_56x25_single">
         <div class="cs_label">
+            <div class="cs_label_shop" t-if="shop_name" t-out="shop_name"/>
             <div class="cs_label_name" t-out="label_name(product)"/>
             <div class="cs_label_row">
                 <div class="cs_label_left">
@@ -62,7 +76,7 @@
             <div class="cs_label_barcode" t-if="barcode">
                 <!-- symbology auto: EAN-13/EAN-8 when valid, Code128 otherwise -->
                 <div t-out="barcode" t-options="{'widget': 'barcode', 'symbology': 'auto', 'quiet': 0,
-                    'width': 380, 'height': 64, 'img_style': 'width:47.5mm;height:8mm'}"/>
+                    'width': 380, 'height': 52, 'img_style': 'width:47.5mm;height:6.5mm'}"/>
                 <div class="cs_label_digits" t-out="barcode"/>
             </div>
         </div>

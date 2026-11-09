@@ -1,6 +1,6 @@
 {
     'name': 'Etiqueta de producto 56 x 25 mm (PDF, impresión directa)',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'summary': 'Etiqueta PDF de 56 x 25 mm para impresoras de etiquetas con driver de Windows, '
                'imprimible desde productos y recepciones sin IoT',
     'author': 'Cositt Technology®',
